@@ -310,10 +310,12 @@ public final class TerminalBuffer {
                     if (cursorAtThisRow)
                         justToCursor = true;
                 } else {
-                    for (int i = 0; i < oldLine.getSpaceUsed(); i++) // NEWLY INTRODUCED BUG! Should not index oldLine.mStyle with char indices
-                    if (oldLine.mText[i] != ' ')
-                        /* || oldLine.mStyle[i] != currentStyle */
-                        lastNonSpaceIndex = i + 1;
+                    for (int i = 0; i < oldLine.getSpaceUsed(); i++) {
+                        // NEWLY INTRODUCED BUG! Should not index oldLine.mStyle with char indices
+                        if (oldLine.mText[i] != ' ')
+                            /* || oldLine.mStyle[i] != currentStyle */
+                            lastNonSpaceIndex = i + 1;
+                    }
                 }
                 int currentOldCol = 0;
                 long styleAtCol = 0;
