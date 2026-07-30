@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import com.termux.R;
 import com.termux.shared.interact.ShareUtils;
 import com.termux.shared.termux.shell.command.runner.terminal.TermuxSession;
+import com.termux.shared.termux.crash.TermuxCrashUtils;
 import com.termux.shared.termux.interact.TextInputDialogUtils;
 import com.termux.app.TermuxActivity;
 import com.termux.shared.termux.terminal.TermuxTerminalSessionClientBase;
@@ -290,9 +291,14 @@ public class TermuxTerminalSessionActivityClient extends TermuxTerminalSessionCl
     public void setCurrentSession(TerminalSession session) {
         if (session == null)
             return;
-        if (mActivity.getTerminalView().attachSession(session)) {
-            // notify about switched session if not already displaying the session
-            notifyOfSessionChange();
+        try {
+            if (mActivity.getTerminalView().attachSession(session)) {
+                // notify about switched session if not already displaying the session
+                notifyOfSessionChange();
+            }
+        } catch (UnsatisfiedLinkError e) {
+            onTerminalLibraryLoadFailure(e);
+            return;
         }
         // We call the following even when the session is already being displayed since config may
         // be stale, like current session not selected or scrolled to.
@@ -300,6 +306,14 @@ public class TermuxTerminalSessionActivityClient extends TermuxTerminalSessionCl
         // Background color may have changed. If the background is image and already set,
         // no need for update.
         mActivity.getmTermuxBackgroundManager().updateBackground(false);
+    }
+
+    private void onTerminalLibraryLoadFailure(UnsatisfiedLinkError e) {
+        String title = mActivity.getString(R.string.error_terminal_native_library_load_failed_title);
+        Logger.logStackTraceWithMessage(LOG_TAG, title, e);
+        TermuxCrashUtils.sendCrashReportNotification(mActivity, LOG_TAG, title, null, e);
+        mActivity.showToast(mActivity.getString(R.string.error_terminal_native_library_load_failed_body), true);
+        mActivity.finishActivityIfNotFinishing();
     }
 
     void notifyOfSessionChange() {

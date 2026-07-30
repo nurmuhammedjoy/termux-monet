@@ -147,6 +147,8 @@
     <!-- Miscellaneous -->
     <string name="error_termux_service_start_failed_general">Failed to start TermuxService. Check logcat for exception message.</string>
     <string name="error_termux_service_start_failed_bg">Failed to start TermuxService while app is in background due to android background restrictions.</string>
+    <string name="error_terminal_native_library_load_failed_title">Failed to load terminal native library</string>
+    <string name="error_terminal_native_library_load_failed_body">Could not start terminal session. Please free memory and reopen &TERMUX_APP_NAME;.</string>
 
 
 
